@@ -18,8 +18,9 @@ const SplashScreen = () => {
 
     useEffect(() => {
       setTimeout(() => {
-          getAuth().onAuthStateChanged((userdata) => {
+          const unsubscribe = getAuth().onAuthStateChanged((userdata) => {
              const routeName  = userdata ? 'Home' : 'Login';
+             unsubscribe();
              navigation.dispatch(
                 StackActions.replace(routeName)
                 );

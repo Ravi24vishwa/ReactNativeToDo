@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from '@react-native-firebase/auth';
 import {
   StyleSheet,
   Text,
@@ -11,9 +9,36 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import React, { useState } from 'react';
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from '@react-native-firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleAuthProvider, signInWithCredential } from '@react-native-firebase/auth';
 
+async function onGoogleButtonPress() {
+  try {
+    // 1️⃣ Start Google sign-in process
+    const { idToken } = await GoogleSignin.signIn();
+
+    // 2️⃣ Create a Google credential with the token
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+    // 3️⃣ Sign-in (or sign-up) the user with Firebase
+    const userCredential = await auth().signInWithCredential(googleCredential);
+
+    // 4️⃣ Handle result
+    console.log('User signed in with Google:', userCredential.user);
+    Alert.alert('Welcome!', userCredential.user.displayName);
+  } catch (error) {
+    console.error('Google sign-in error:', error);
+    Alert.alert('Error', error.message);
+  }
+}
+
+GoogleSignin.configure({
+  webClientId: '585858648557-nqkc1k0n8fq38b3us6ojl3e29p927vv8.apps.googleusercontent.com'
+})
 
 const SignUp = () => {
   const [email, setemail] = useState("");
@@ -21,16 +46,22 @@ const SignUp = () => {
   const [message, setmessage] = useState("")
 
   const navigation = useNavigation();
-  const handleSignUp = async() => {
+  const handleSignUp = async () => {
     try {
-      if(email.length > 0 && password.length > 0){
+      if (email.length > 0 && password.length > 0) {
+        const UserLoginData = await getAuth().createUserWithEmailAndPassword(email, password);
+        console.log(`this is userlogindata before : ${UserLoginData}`)
 
-        // console.log(`email => ${email} and password => ${password}`)
-        
-        const UserLoginData = await createUserWithEmailAndPassword(getAuth(), email, password);
-        // console.log(UserLoginData)
+        await getAuth().currentUser.sendEmailVerification();
+
+        await getAuth().signOut();
+
+        alert('Please verify your email')
+        navigation.dispatch(
+          StackActions.replace('Login')
+        )
       }
-      else{
+      else {
         alert('Enter details please')
       }
     } catch (err) {
@@ -40,8 +71,13 @@ const SignUp = () => {
     }
   }
   const HandleExistingAccount = () => {
-    navigation.navigate("Login")
-  } 
+    navigation.dispatch(
+      StackActions.replace('Login')
+    )
+  }
+  const GoogleLoginFn = () => {
+    onGoogleButtonPress()
+  }
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -69,7 +105,7 @@ const SignUp = () => {
               onChangeText={value => (setpassword(value))}
             />
             <TouchableOpacity
-              style={styles.loginButton}
+              style={styles.SignUpButton}
               accessibilityLabel="Login Button"
               activeOpacity={0.7}
               onPress={() => (handleSignUp())}
@@ -77,11 +113,10 @@ const SignUp = () => {
               <Text style={styles.loginText}>Sign Up</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.SignUpButton}
+              style={styles.LoginRedirectButton}
               accessibilityLabel="SignUp Button"
               activeOpacity={0.7}
-              onPress={() => (HandleExistingAccount())}
-            >
+              onPress={() => (HandleExistingAccount())}>
               <Text style={styles.ExistingText}>Already Have account ? Login Here</Text>
             </TouchableOpacity>
             <Text>{message}</Text>
@@ -125,7 +160,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     width: '80%',
   },
-  loginButton: {
+  SignUpButton: {
     backgroundColor: '#e63946',
     width: '80%',
     height: 45,
@@ -141,5 +176,23 @@ const styles = StyleSheet.create({
   },
   ExistingText: {
     color: 'blue'
+  },
+  LoginRedirectButton: {
+    //  backgroundColor: '#e63946',
+    width: '80%',
+    height: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginTop: 5,
+  },
+  GoogleLoginButton: {
+    backgroundColor: '#e63946',
+    width: '50%',
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginTop: 25,
   }
 });

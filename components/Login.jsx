@@ -25,11 +25,18 @@ const Login = () => {
      try {
       if(email.length > 0 && password.length > 0){
         
-        // console.log(`email => ${email} and password => ${password}`)
-        // console.log('called login')
-        const UserLoginData = await signInWithEmailAndPassword(getAuth(), email, password);
-        setmessage("")
-        navigation.dispatch(StackActions.replace('Home'));
+        const UserLoginData = await getAuth().signInWithEmailAndPassword(email, password);
+        console.log(UserLoginData)
+
+        if(UserLoginData.user.emailVerified){
+          alert('You are verified')
+          navigation.dispatch(StackActions.replace('Home'));
+        }
+        else{
+          await getAuth().currentUser.sendEmailVerification()
+          await getAuth().signOut();
+          alert('please check your inbox to verify')
+        }
         // navigation.navigate("Home", {
         //  user: UserLoginData.user.email,
         //  uid: UserLoginData.user.uid
@@ -47,7 +54,7 @@ const Login = () => {
    }
 
    const HandleSignUp = async() => {
-    navigation.navigate("SignUp")
+    navigation.dispatch(StackActions.replace('SignUp'))
    }
    return (
      <SafeAreaView style={styles.safeArea}>

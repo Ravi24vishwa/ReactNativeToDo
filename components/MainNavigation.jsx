@@ -21,6 +21,7 @@ export default function MainNavigation() {
         screenOptions={{
           animation: 'slide_from_right',
          }}
+         initialRouteName='SplashScreen'
       >
         <Stack.Screen name="SplashScreen" component={SplashScreen} options={{headerShown: false}}/> 
         <Stack.Screen name="Login" component={Login} options={{headerShown: false}}/> 
