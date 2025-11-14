@@ -56,6 +56,10 @@ const Login = () => {
    const HandleSignUp = async() => {
     navigation.dispatch(StackActions.replace('SignUp'))
    }
+
+   const HandleImageUpload = () => {
+    navigation.dispatch(StackActions.replace('ImageUploadScreen'))
+   }
    return (
      <SafeAreaView style={styles.safeArea}>
        <KeyboardAvoidingView
@@ -97,6 +101,14 @@ const Login = () => {
                onPress={() => (HandleSignUp())}
              >
                <Text style={styles.SignUp}>New User ?</Text>
+             </TouchableOpacity>
+             <TouchableOpacity
+               style={styles.ImageButton}
+               accessibilityLabel="Login Button"
+               activeOpacity={0.7}
+               onPress={() => (HandleImageUpload())}
+             >
+               <Text style={styles.loginText}>ImageUpload</Text>
              </TouchableOpacity>
              <Text>{message}</Text>
             </View>
@@ -140,6 +152,15 @@ const styles = StyleSheet.create({  safeArea: {
   },
   loginButton: {
     backgroundColor: '#e63946',
+    width: '80%',
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginTop: 25,
+  },
+  ImageButton: {
+    backgroundColor: '#57bdfcff',
     width: '80%',
     height: 45,
     justifyContent: 'center',

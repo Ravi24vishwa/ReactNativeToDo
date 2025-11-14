@@ -11,6 +11,8 @@ import SignUp from './SignUp';
 import HomeScreen from './HomeScreen';
 import Login from './Login';
 import SplashScreen from './SplashScreen';
+import PhoneVerifyScreen from './PhoneVerifyScreen'
+import ImageUploadScreen from './ImageUploadScreen'
 
 const Stack = createNativeStackNavigator();
 
@@ -50,12 +52,23 @@ export default function MainNavigation() {
         screenOptions={{
           animation: 'slide_from_right',
         }}
-        initialRouteName={user ? 'Home' : 'SplashScreen'}
+        //initialRouteName={user ? 'Home' : 'SplashScreen'}
       >
+        
+        {/* <Stack.Screen
+        name="Phoneverification"
+        component={PhoneVerifyScreen}
+        options={{headerShown: false}}
+        /> */}
         {/* Splash Screen */}
         <Stack.Screen
           name="SplashScreen"
           component={SplashScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ImageUploadScreen"
+          component={ImageUploadScreen}
           options={{ headerShown: false }}
         />
 
