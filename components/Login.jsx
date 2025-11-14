@@ -27,7 +27,7 @@ const Login = () => {
         
         const UserLoginData = await getAuth().signInWithEmailAndPassword(email, password);
         console.log(UserLoginData)
-
+        
         if(UserLoginData.user.emailVerified){
           alert('You are verified')
           navigation.dispatch(StackActions.replace('Home'));

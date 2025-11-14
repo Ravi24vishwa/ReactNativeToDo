@@ -1,32 +1,82 @@
-// In App.js in a new project
-
-import  React, {useState} from 'react';
-import { View, Text, Button } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+// App.js (or MainNavigation.js)
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
 
-//import screens
+// Import screens
 import SignUp from './SignUp';
-import HomeScreen from './HomeScreen'
-import Login from './Login'
-import SplashScreen from './SplashScreen'
+import HomeScreen from './HomeScreen';
+import Login from './Login';
+import SplashScreen from './SplashScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigation() {
-   
-  return(
-     <NavigationContainer>
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
+
+  // ✅ Configure Google Sign-in once
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '585858648557-nqkc1k0n8fq38b3us6ojl3e29p927vv8.apps.googleusercontent.com',
+    });
+  }, []);
+
+  // ✅ Track Firebase Auth state
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(currentUser => {
+      setUser(currentUser);
+      if (initializing) setInitializing(false);
+    });
+    return unsubscribe;
+  }, [initializing]);
+
+  // ✅ Show SplashScreen while checking user status
+  if (initializing) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
+  return (
+    <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
           animation: 'slide_from_right',
-         }}
-         initialRouteName='SplashScreen'
+        }}
+        initialRouteName={user ? 'Home' : 'SplashScreen'}
       >
-        <Stack.Screen name="SplashScreen" component={SplashScreen} options={{headerShown: false}}/> 
-        <Stack.Screen name="Login" component={Login} options={{headerShown: false}}/> 
-        <Stack.Screen name="SignUp" component={SignUp} /> 
-        <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}}/>
+        {/* Splash Screen */}
+        <Stack.Screen
+          name="SplashScreen"
+          component={SplashScreen}
+          options={{ headerShown: false }}
+        />
+
+        {/* Login / SignUp */}
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SignUp"
+          component={SignUp}
+          options={{ headerShown: false }}
+        />
+
+        {/* Home (protected) */}
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
